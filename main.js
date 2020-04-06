@@ -3,20 +3,20 @@ const baseURL = "https://swapi.co/api/";
 function getData(type, cb) {
     var xhr = new XMLHttpRequest();
 
-    xhr.open("GET", baseURL + type + "/");
-    xhr.send();
-
     xhr.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200){
             cb(JSON.parse(this.responseText));
         }
     };
+
+    xhr.open("GET", baseURL + type + "/");
+    xhr.send();
 }
 
 function getTableHeaders (obj) {
     var tableHeaders = [];
 
-    Object.keys(obj).forEach(function (){
+    Object.keys(obj).forEach(function (key){
         tableHeaders.push(`<td>${key}</td>`);
     });
 
@@ -24,6 +24,7 @@ function getTableHeaders (obj) {
 }
 
 function writeToDocument(type) {
+    var tableRows = [];
     var el = document.getElementById("data");
     el.innerHTML = "";
 
@@ -32,8 +33,18 @@ function writeToDocument(type) {
         var tableHeaders = getTableHeaders(data[0]);
 
         data.forEach(function(item){
-            // el.innerHTML += "<p>" + item.name + "</p>";
+            var dataRow = [];
+
+            Object.keys(item).forEach(function(key){
+                var rowData = item[key].toString();
+                var truncatedData = rowData.substring(0,15);
+                if (rowData.length > 15) {
+                    truncatedData += "...";
+                }
+                dataRow.push(`<td>${truncatedData}</td>`);
+            });
+            tableRows.push(`<tr>${dataRow}</tr>`);
         })
-        el.innerHTML = `<table>${tableHeaders}</table>`;
+        el.innerHTML = `<table>${tableHeaders}${tableRows}</table>`;
     });
 }
